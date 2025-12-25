@@ -1,0 +1,412 @@
+/* Resetare stiluri implicite pentru consistenta */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Stilizare generala pentru body - tema dark */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0a0a0a;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Container principal pentru formularul de autentificare */
+.container {
+    max-width: 400px;
+    margin: 50px auto;
+    background: transparent;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Container pentru logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Stilizare pentru logo */
+.logo {
+    max-width: 250px;
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    transition: transform 0.3s ease-in-out;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+}
+
+/* Stilizare pentru titluri - tema dark */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 2em;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+/* Stilizare pentru campurile de input */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Efect la focus pe input-uri */
+input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Stilizare pentru butoane */
+button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Efect hover pe butoane */
+button:hover {
+    background: #5568d3;
+}
+
+/* Container pentru dashboard-ul principal - tema dark */
+#dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #171717;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    color: white;
+}
+
+#dashboard h1 {
+    color: white;
+    margin-bottom: 30px;
+}
+
+/* Sectiunea pentru adaugarea unui film - tema dark */
+.add-movie {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.add-movie input {
+    flex: 1;
+    background-color: #252525;
+    color: #d3d3d3;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    font-size: 16px;
+    box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+}
+
+.add-movie input:focus {
+    outline: none;
+    box-shadow: inset 2px 5px 10px rgb(5, 5, 5), 0 0 0 2px #333;
+}
+
+.add-movie input::placeholder {
+    color: #888;
+}
+
+.add-movie button {
+    width: auto;
+    min-width: 120px;
+    background-color: #252525;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .4s ease-in-out;
+}
+
+.add-movie button:hover {
+    background-color: black;
+}
+
+/* Container pentru cele trei liste de filme (grid layout) */
+.movie-lists {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 30px;
+}
+
+/* Stilizare pentru fiecare coloana de lista - tema dark */
+.list-column {
+    background: #252525;
+    padding: 20px;
+    border-radius: 15px;
+    min-height: 400px;
+    box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+}
+
+.list-column h2 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+/* Stilizare pentru fiecare film din lista - tema dark */
+.movie-item {
+    background: #171717;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #d3d3d3;
+    transition: .3s ease-in-out;
+}
+
+.movie-item:hover {
+    background: #1f1f1f;
+    transform: translateX(5px);
+}
+
+/* Butoanele pentru actiuni pe fiecare film - tema dark */
+.movie-item button {
+    width: auto;
+    padding: 5px 10px;
+    margin: 0 5px;
+    font-size: 12px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .3s ease-in-out;
+}
+
+.movie-item button:hover {
+    background-color: #444;
+}
+
+/* Butonul de logout - tema dark */
+.logout-btn {
+    margin-top: 30px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .4s ease-in-out;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+}
+
+/* Stilizare pentru notificari */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    display: none;
+    min-width: 250px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Notificare de succes (verde) */
+.notification.success {
+    background-color: #28a745;
+    display: block;
+}
+
+/* Notificare de eroare (rosu) */
+.notification.error {
+    background-color: #dc3545;
+    display: block;
+}
+
+/* Animatie pentru notificari */
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Stiluri pentru formularul de login */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-bottom: 0.4em;
+    padding-top: 1em;
+    background-color: #171717;
+    border-radius: 25px;
+    transition: .3s ease-in-out;
+    max-width: 100%;
+    border: 1px solid transparent;
+}
+
+.form:hover {
+    transform: scale(1.02);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Efect de glow alb pentru a face box-ul mai vizibil */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+                0 0 40px rgba(255, 255, 255, 0.2),
+                0 5px 20px rgba(0,0,0,0.5);
+}
+
+#heading {
+    text-align: center;
+    margin: 2em;
+    color: rgb(255, 255, 255);
+    font-size: 1.2em;
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    border-radius: 25px;
+    padding: 0.6em;
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #171717;
+    box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+}
+
+.input-icon {
+    height: 1.3em;
+    width: 1.3em;
+    fill: white;
+}
+
+.input-field {
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #d3d3d3;
+}
+
+.form .btn {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-top: 2.5em;
+}
+
+.button1 {
+    padding: 0.5em;
+    padding-left: 1.1em;
+    padding-right: 1.1em;
+    border-radius: 5px;
+    margin-right: 0.5em;
+    border: none;
+    outline: none;
+    transition: .4s ease-in-out;
+    background-color: #252525;
+    color: white;
+    cursor: pointer;
+}
+
+.button1:hover {
+    background-color: black;
+    color: white;
+}
+
+.button2 {
+    padding: 0.5em;
+    padding-left: 2.3em;
+    padding-right: 2.3em;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: .4s ease-in-out;
+    background-color: #252525;
+    color: white;
+    cursor: pointer;
+}
+
+.button2:hover {
+    background-color: black;
+    color: white;
+}
+
+.button3 {
+    margin-bottom: 3em;
+    padding: 0.5em;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: .4s ease-in-out;
+    background-color: #252525;
+    color: white;
+    cursor: pointer;
+}
+
+.button3:hover {
+    background-color: red;
+    color: white;
+}
+
+/* Adaptare container pentru formularul nou */
+#auth-container {
+    margin-top: 20px;
+}
+
+#auth-container .form {
+    margin-top: 20px;
+}
+
+/* Responsive design pentru ecrane mai mici */
+@media (max-width: 768px) {
+    .movie-lists {
+        grid-template-columns: 1fr;
+    }
+    
+    .notification {
+        right: 10px;
+        left: 10px;
+        min-width: auto;
+    }
+}
