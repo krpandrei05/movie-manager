@@ -147,8 +147,7 @@ pip install -r requirements.txt
 
 2. Porneste serverul:
 ```bash
-cd server
-python app.py
+python3 server/app.py
 ```
 
 3. Deschide browserul la adresa:
