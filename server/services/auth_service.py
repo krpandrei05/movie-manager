@@ -1,16 +1,19 @@
+"""
+Modul pentru logica de business pentru autentificare
+Contine functiile pentru inregistrare si login
+"""
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
-
-# Functie pentru deschiderea conexiunii la baza de date
-def get_db_connection():
-    # Cream fisierul bazei de date local
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+from models.database import get_db_connection
 
 # Functie pentru procesarea inregistrarii unui utilizator nou
 def proceseaza_inregistrare():
+    """
+    Proceseaza cererea de inregistrare a unui utilizator nou
+    Returns:
+        JSON response cu mesaj de succes sau eroare
+    """
     # Preluam datele din cerere
     date = request.get_json()
     
@@ -50,6 +53,11 @@ def proceseaza_inregistrare():
 
 # Functie pentru procesarea autentificarii unui utilizator
 def proceseaza_login():
+    """
+    Proceseaza cererea de autentificare a unui utilizator
+    Returns:
+        JSON response cu token sau mesaj de eroare
+    """
     # Preluam datele din cerere
     date = request.get_json()
     
@@ -79,3 +87,4 @@ def proceseaza_login():
     
     # Returnam eroare daca username ul sau parola sunt invalide
     return jsonify({"message": "Incorrect username or password"}), 401
+

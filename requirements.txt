@@ -1,0 +1,8 @@
+# Biblioteci Python necesare pentru proiectul Movie Manager
+
+# Framework web Flask
+Flask==3.0.0
+
+# Utilitare pentru securitate (criptare parole)
+Werkzeug==3.0.1
+

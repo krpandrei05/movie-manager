@@ -13,6 +13,18 @@
     <!-- Container pentru notificari (apare in partea de sus a paginii) -->
     <div id="notification" class="notification"></div>
     
+    <!-- Container pentru confirmare personalizata (pentru stergere film) -->
+    <div id="confirm-dialog" class="confirm-dialog">
+        <div class="confirm-dialog-content">
+            <h3 class="confirm-title">Confirm Delete</h3>
+            <p class="confirm-message" id="confirm-message">Are you sure you want to delete this movie?</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn confirm-yes" id="confirm-yes">Yes</button>
+                <button class="confirm-btn confirm-no" id="confirm-no">No</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Container pentru formularul de autentificare si inregistrare -->
     <div id="auth-container" class="container">
         <!-- Logo-ul aplicatiei -->
@@ -65,37 +77,148 @@
 
     <!-- Dashboard-ul principal (ascuns initial, apare dupa autentificare) -->
     <div id="dashboard" style="display: none;">
-        <h1>Your Movie Collection</h1>
-        
-        <!-- Sectiunea pentru adaugarea unui film nou -->
-        <div class="add-movie">
-            <input type="text" id="movie-title" placeholder="Movie Title">
-            <button onclick="addMovie()">Add</button>
-        </div>
-        
-        <!-- Container pentru cele trei liste de filme -->
-        <div class="movie-lists">
-            <!-- Lista "To Watch" -->
-            <div class="list-column">
-                <h2>To Watch</h2>
-                <div id="to-watch-list"></div>
+        <!-- Meniu lateral pe stanga -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard'); return false;">My Movies</a></li>
+                    <li><a href="#" class="nav-item" data-page="friends" onclick="showPage('friends'); return false;">Friends</a></li>
+                    <li><a href="#" class="nav-item" data-page="recommendations" onclick="showPage('recommendations'); return false;">Recommendations</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="logout-btn">Logout</button>
             </div>
-            
-            <!-- Lista "Watching" -->
-            <div class="list-column">
-                <h2>Watching</h2>
-                <div id="watching-list"></div>
+        </aside>
+
+        <!-- Continutul principal al paginii -->
+        <main class="main-content">
+            <!-- Header cu logo, nume aplicatie si username -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="header-logo" onclick="toggleSidebar()" style="cursor: pointer;" title="Toggle menu">
+                    <h2 class="header-title">Movie Manager</h2>
+                </div>
+                <div class="user-info">
+                    <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                    </svg>
+                    <span id="username-display" class="username-text">User</span>
+                </div>
+            </header>
+
+            <!-- Container principal pentru continut -->
+            <div class="content-wrapper">
+                <!-- Pagina My Movies (vizibila initial) -->
+                <div id="page-dashboard" class="page-content">
+                    <!-- Sectiunea stanga - Listele de filme -->
+                    <section class="movies-section">
+                        <h1 class="page-title">My Movies</h1>
+                        <!-- Sectiunea pentru adaugarea unui film nou -->
+                        <div class="add-movie">
+                            <div class="movie-search-container">
+                                <input type="text" id="movie-title" placeholder="Search movie title..." autocomplete="off" oninput="searchMovies(this.value); selectedMovieDashboard = null;" onfocus="showSearchResults()" onblur="hideSearchResults()">
+                                <!-- Dropdown pentru rezultatele cautarii -->
+                                <div id="movie-search-results" class="movie-search-results"></div>
+                            </div>
+                            <button onclick="addMovie()" class="add-movie-btn">Add Movie</button>
+                        </div>
+                        
+                        <!-- Container pentru cele trei liste de filme -->
+                        <div class="movie-lists">
+                            <!-- Lista "To Watch" -->
+                            <div class="list-column">
+                                <h2>To Watch</h2>
+                                <div id="to-watch-list" class="movie-list"></div>
+                            </div>
+                            
+                            <!-- Lista "Watching" -->
+                            <div class="list-column">
+                                <h2>Watching</h2>
+                                <div id="watching-list" class="movie-list"></div>
+                            </div>
+                            
+                            <!-- Lista "Completed" -->
+                            <div class="list-column">
+                                <h2>Completed</h2>
+                                <div id="completed-list" class="movie-list"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Pagina Friends (lista de prieteni) -->
+                <div id="page-friends" class="page-content" style="display: none;">
+                    <section class="friends-page-section">
+                        <h1 class="page-title">Friends</h1>
+                        <!-- Formular pentru adaugarea unui prieten -->
+                        <div class="add-friend-page">
+                            <input type="text" id="friend-username-page" placeholder="Search user..." class="friend-input">
+                            <button onclick="addFriendFromPage()" class="add-friend-btn">Add Friend</button>
+                        </div>
+                        <!-- Lista de prieteni -->
+                        <div id="friends-list-page" class="friends-list-page"></div>
+                    </section>
+                </div>
+
+                <!-- Pagina Recommendations (recomandarile primite) -->
+                <div id="page-recommendations" class="page-content" style="display: none;">
+                    <section class="recommendations-section">
+                        <h1 class="page-title">Recommendations</h1>
+                        <!-- Lista de recomandari -->
+                        <div id="recommendations-list" class="recommendations-list"></div>
+                    </section>
+                </div>
+
+                <!-- Pagina Friend Profile (pagina unui prieten specific) -->
+                <div id="page-friend-profile" class="page-content" style="display: none;">
+                    <section class="friend-profile-section">
+                        <!-- Titlul profilului prietenului -->
+                        <h1 class="page-title" id="friend-profile-name">Friend's Profile</h1>
+                        
+                        <!-- Toate listele de filme ale prietenului -->
+                        <div class="friend-movies-section">
+                            <!-- Lista "To Watch" -->
+                            <div class="friend-list-column">
+                                <h2>To Watch</h2>
+                                <div id="friend-to-watch-list" class="friend-movies-list"></div>
+                            </div>
+                            
+                            <!-- Lista "Watching" -->
+                            <div class="friend-list-column">
+                                <h2>Watching</h2>
+                                <div id="friend-watching-list" class="friend-movies-list"></div>
+                            </div>
+                            
+                            <!-- Lista "Completed" -->
+                            <div class="friend-list-column">
+                                <h2>Completed</h2>
+                                <div id="friend-completed-list" class="friend-movies-list"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Formular pentru recomandare film -->
+                        <div class="recommend-movie-section">
+                            <h2>Recommend a Movie</h2>
+                            <div class="recommend-form">
+                                <div class="movie-search-container">
+                                    <input type="text" id="recommend-movie-title" placeholder="Search movie title..." autocomplete="off" class="friend-input" oninput="searchMoviesRecommend(this.value); selectedMovieRecommend = null;" onfocus="showSearchResultsRecommend()" onblur="hideSearchResultsRecommend()">
+                                    <!-- Dropdown pentru rezultatele cautarii -->
+                                    <div id="movie-search-results-recommend" class="movie-search-results"></div>
+                                </div>
+                                <button onclick="recommendMovie()" class="add-friend-btn">Send Recommendation</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Butonul de back -->
+                        <div class="friend-profile-footer">
+                            <button onclick="showPage('friends')" class="back-btn">← Back to Friends</button>
+                        </div>
+                    </section>
+                </div>
             </div>
-            
-            <!-- Lista "Completed" -->
-            <div class="list-column">
-                <h2>Completed</h2>
-                <div id="completed-list"></div>
-            </div>
-        </div>
-        
-        <!-- Buton pentru delogare -->
-        <button onclick="logout()" class="logout-btn">Logout</button>
+        </main>
     </div>
 
     <!-- Incarcam fisierul JavaScript cu logica aplicatiei -->
