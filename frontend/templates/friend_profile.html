@@ -3,7 +3,7 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/movie_search.js') }}"></script>
 <script>
-    // Resetăm validarea când se modifică input-ul
+    // Resetam validarea cand se modifica input-ul
     document.addEventListener('DOMContentLoaded', function() {
         const recommendInput = document.getElementById('recommend-movie-title');
         if (recommendInput) {

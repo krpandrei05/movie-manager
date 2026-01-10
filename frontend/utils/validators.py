@@ -1,13 +1,5 @@
-"""
-Utilitare pentru validare input
-Conține funcții de validare pentru username, password, etc.
-"""
-
+# Valideaza un username
 def validate_username(username):
-    """
-    Validează un username
-    Returns: (valid: bool, message: str)
-    """
     if not username or not username.strip():
         return False, 'Username is required'
     
@@ -16,11 +8,8 @@ def validate_username(username):
     
     return True, ''
 
+# Valideaza o parola
 def validate_password(password):
-    """
-    Validează o parolă
-    Returns: (valid: bool, message: str)
-    """
     if not password or not password.strip():
         return False, 'Password is required'
     
@@ -29,21 +18,15 @@ def validate_password(password):
     
     return True, ''
 
+# Valideaza un titlu de film
 def validate_movie_title(title):
-    """
-    Validează un titlu de film
-    Returns: (valid: bool, message: str)
-    """
     if not title or not title.strip():
         return False, 'Movie title is required'
     
     return True, ''
 
+# Valideaza un rating (1-10)
 def validate_rating(rating):
-    """
-    Validează un rating (1-10)
-    Returns: (valid: bool, message: str)
-    """
     try:
         rating_value = int(rating)
         if rating_value < 1 or rating_value > 10:
@@ -51,4 +34,3 @@ def validate_rating(rating):
         return True, ''
     except (ValueError, TypeError):
         return False, 'Rating must be a number'
-

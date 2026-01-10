@@ -1,35 +1,31 @@
-"""
-View handlers pentru dashboard (My Movies)
-"""
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import sys
 import os
 
-# Importăm din backend
+# Importam din backend
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BACKEND_DIR = os.path.join(BASE_DIR, 'backend')
 sys.path.insert(0, BACKEND_DIR)
 
 from models.database import get_db_connection
-from security import verifica_token
 
-# Importăm validators din frontend
+# Importam validators din frontend
 FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, FRONTEND_DIR)
 from utils.validators import validate_movie_title, validate_rating
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
+# Verifica daca utilizatorul este autentificat
 def require_auth():
-    """Verifică dacă utilizatorul este autentificat"""
     if 'user_id' not in session:
         flash('Please login first', 'error')
         return redirect(url_for('auth.show_login'))
     return None
 
 @dashboard_bp.route('/dashboard')
+# Afiseaza dashboard-ul cu filmele utilizatorului
 def show_dashboard():
-    """Afișează dashboard-ul cu filmele utilizatorului"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -37,7 +33,7 @@ def show_dashboard():
     user_id = session['user_id']
     username = session.get('username', 'User')
     
-    # Obținem filmele din baza de date
+    # Obtinem filmele din baza de date
     conn = get_db_connection()
     movies_data = conn.execute(
         'SELECT id, title, status, rating FROM movies WHERE user_id = ?',
@@ -45,7 +41,7 @@ def show_dashboard():
     ).fetchall()
     conn.close()
     
-    # Organizăm filmele pe liste
+    # Organizam filmele pe liste
     movies = {'To Watch': [], 'Watching': [], 'Completed': []}
     for row in movies_data:
         status = row['status']
@@ -57,7 +53,7 @@ def show_dashboard():
                 'rating': rating
             })
     
-    # Obținem lista de prieteni pentru sidebar
+    # Obtinem lista de prieteni pentru sidebar
     conn = get_db_connection()
     friends_data = conn.execute('''
         SELECT DISTINCT u.username 
@@ -75,8 +71,8 @@ def show_dashboard():
                          friends=friends)
 
 @dashboard_bp.route('/movies/add', methods=['POST'])
+# Adauga un film nou
 def add_movie():
-    """Adaugă un film nou"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -86,7 +82,7 @@ def add_movie():
     status = request.form.get('status', 'To Watch')
     movie_validated = request.form.get('movie_validated', '0')
     
-    # Validare strictă: verificăm dacă filmul a fost selectat din dropdown
+    # Validare stricta: verificam daca filmul a fost selectat din dropdown
     if movie_validated != '1':
         flash('Please select a movie from the dropdown list.', 'error')
         return redirect(url_for('dashboard.show_dashboard'))
@@ -97,12 +93,23 @@ def add_movie():
         flash(message, 'error')
         return redirect(url_for('dashboard.show_dashboard'))
     
-    # Verificăm statusul
+    # Verificam statusul
     if status not in ['To Watch', 'Watching', 'Completed']:
         status = 'To Watch'
     
-    # Adăugăm filmul în baza de date
+    # Verificam daca filmul exista deja pentru acest utilizator
     conn = get_db_connection()
+    existing_movie = conn.execute(
+        'SELECT id FROM movies WHERE user_id = ? AND title = ?',
+        (user_id, title)
+    ).fetchone()
+    
+    if existing_movie:
+        conn.close()
+        flash('This movie already exists in your list!', 'error')
+        return redirect(url_for('dashboard.show_dashboard'))
+    
+    # Adaugam filmul in baza de date
     try:
         conn.execute(
             'INSERT INTO movies (user_id, title, status, rating) VALUES (?, ?, ?, ?)',
@@ -118,8 +125,8 @@ def add_movie():
     return redirect(url_for('dashboard.show_dashboard'))
 
 @dashboard_bp.route('/movies/<int:movie_id>/move', methods=['POST'])
+# Muta un film intre liste
 def move_movie(movie_id):
-    """Mută un film între liste"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -132,7 +139,7 @@ def move_movie(movie_id):
         return redirect(url_for('dashboard.show_dashboard'))
     
     conn = get_db_connection()
-    # Verificăm că filmul aparține utilizatorului
+    # Verificam ca filmul apartine utilizatorului
     movie = conn.execute(
         'SELECT id FROM movies WHERE id = ? AND user_id = ?',
         (movie_id, user_id)
@@ -143,7 +150,7 @@ def move_movie(movie_id):
         flash('Movie not found', 'error')
         return redirect(url_for('dashboard.show_dashboard'))
     
-    # Actualizăm statusul
+    # Actualizam statusul
     conn.execute(
         'UPDATE movies SET status = ? WHERE id = ? AND user_id = ?',
         (new_status, movie_id, user_id)
@@ -155,8 +162,8 @@ def move_movie(movie_id):
     return redirect(url_for('dashboard.show_dashboard'))
 
 @dashboard_bp.route('/movies/<int:movie_id>/rate', methods=['POST'])
+# Noteaza un film
 def rate_movie(movie_id):
-    """Notează un film"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -171,7 +178,7 @@ def rate_movie(movie_id):
         return redirect(url_for('dashboard.show_dashboard'))
     
     conn = get_db_connection()
-    # Verificăm că filmul aparține utilizatorului
+    # Verificam ca filmul apartine utilizatorului
     movie = conn.execute(
         'SELECT id FROM movies WHERE id = ? AND user_id = ?',
         (movie_id, user_id)
@@ -182,7 +189,7 @@ def rate_movie(movie_id):
         flash('Movie not found', 'error')
         return redirect(url_for('dashboard.show_dashboard'))
     
-    # Actualizăm rating-ul
+    # Actualizam rating-ul
     conn.execute(
         'UPDATE movies SET rating = ? WHERE id = ? AND user_id = ?',
         (rating, movie_id, user_id)
@@ -194,8 +201,8 @@ def rate_movie(movie_id):
     return redirect(url_for('dashboard.show_dashboard'))
 
 @dashboard_bp.route('/movies/<int:movie_id>/delete', methods=['POST'])
+# Sterge un film
 def delete_movie(movie_id):
-    """Șterge un film"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -203,7 +210,7 @@ def delete_movie(movie_id):
     user_id = session['user_id']
     
     conn = get_db_connection()
-    # Verificăm că filmul aparține utilizatorului
+    # Verificam ca filmul apartine utilizatorului
     movie = conn.execute(
         'SELECT id FROM movies WHERE id = ? AND user_id = ?',
         (movie_id, user_id)
@@ -214,7 +221,7 @@ def delete_movie(movie_id):
         flash('Movie not found', 'error')
         return redirect(url_for('dashboard.show_dashboard'))
     
-    # Ștergem filmul
+    # Stergem filmul
     conn.execute(
         'DELETE FROM movies WHERE id = ? AND user_id = ?',
         (movie_id, user_id)

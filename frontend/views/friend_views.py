@@ -1,41 +1,38 @@
-"""
-View handlers pentru friends și recommendations
-"""
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import sys
 import os
 
-# Importăm din backend
+# Importam din backend
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BACKEND_DIR = os.path.join(BASE_DIR, 'backend')
 sys.path.insert(0, BACKEND_DIR)
 
 from models.database import get_db_connection
 
-# Importăm validators din frontend
+# Importam validators din frontend
 FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, FRONTEND_DIR)
 from utils.validators import validate_username, validate_movie_title
 
 friend_bp = Blueprint('friend', __name__)
 
+# Verifica daca utilizatorul este autentificat
 def require_auth():
-    """Verifică dacă utilizatorul este autentificat"""
     if 'user_id' not in session:
         flash('Please login first', 'error')
         return redirect(url_for('auth.show_login'))
     return None
 
 @friend_bp.route('/friends')
+# Afiseaza pagina de prieteni
 def show_friends():
-    """Afișează pagina de prieteni"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
     
     user_id = session['user_id']
     
-    # Obținem lista de prieteni
+    # Obtinem lista de prieteni
     conn = get_db_connection()
     friends_data = conn.execute('''
         SELECT DISTINCT u.username 
@@ -50,8 +47,8 @@ def show_friends():
     return render_template('friends.html', friends=friends)
 
 @friend_bp.route('/friends/add', methods=['POST'])
+# Adauga un prieten
 def add_friend():
-    """Adaugă un prieten"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -67,7 +64,7 @@ def add_friend():
     
     conn = get_db_connection()
     
-    # Căutăm utilizatorul prieten
+    # Cautam utilizatorul prieten
     friend_user = conn.execute('SELECT id FROM users WHERE username = ?', (friend_username,)).fetchone()
     
     if not friend_user:
@@ -77,13 +74,13 @@ def add_friend():
     
     friend_id = friend_user['id']
     
-    # Verificăm dacă nu încearcă să se adauge pe sine
+    # Verificam daca nu incearca sa se adauge pe sine
     if user_id == friend_id:
         conn.close()
         flash('You cannot add yourself', 'error')
         return redirect(url_for('friend.show_friends'))
     
-    # Verificăm dacă prietenia există deja
+    # Verificam daca prietenia exista deja
     existing = conn.execute('''
         SELECT id FROM friends 
         WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
@@ -94,7 +91,7 @@ def add_friend():
         flash('Friendship already exists', 'error')
         return redirect(url_for('friend.show_friends'))
     
-    # Adăugăm prietenia (bidirecțională)
+    # Adaugam prietenia (bidirectionala)
     try:
         conn.execute('INSERT INTO friends (user_id, friend_id) VALUES (?, ?)', (user_id, friend_id))
         conn.execute('INSERT INTO friends (user_id, friend_id) VALUES (?, ?)', (friend_id, user_id))
@@ -108,15 +105,15 @@ def add_friend():
     return redirect(url_for('friend.show_friends'))
 
 @friend_bp.route('/friends/<username>')
+# Afiseaza profilul unui prieten
 def show_friend_profile(username):
-    """Afișează profilul unui prieten"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
     
     user_id = session['user_id']
     
-    # Verificăm dacă prietenia există
+    # Verificam daca prietenia exista
     conn = get_db_connection()
     friend_user = conn.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone()
     
@@ -127,7 +124,7 @@ def show_friend_profile(username):
     
     friend_id = friend_user['id']
     
-    # Verificăm prietenia
+    # Verificam prietenia
     friendship = conn.execute('''
         SELECT id FROM friends 
         WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)
@@ -138,14 +135,14 @@ def show_friend_profile(username):
         flash('You are not friends with this user', 'error')
         return redirect(url_for('friend.show_friends'))
     
-    # Obținem filmele prietenului
+    # Obtinem filmele prietenului
     movies_data = conn.execute(
         'SELECT id, title, status, rating FROM movies WHERE user_id = ? ORDER BY status, title',
         (friend_id,)
     ).fetchall()
     conn.close()
     
-    # Organizăm filmele pe liste
+    # Organizam filmele pe liste
     movies = {'To Watch': [], 'Watching': [], 'Completed': []}
     for row in movies_data:
         status = row['status']
@@ -160,8 +157,8 @@ def show_friend_profile(username):
     return render_template('friend_profile.html', friend_username=username, movies=movies)
 
 @friend_bp.route('/friends/<username>/recommend', methods=['POST'])
+# Recomanda un film unui prieten
 def recommend_movie(username):
-    """Recomandă un film unui prieten"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -170,7 +167,7 @@ def recommend_movie(username):
     movie_title = request.form.get('movie_title', '').strip()
     movie_validated = request.form.get('movie_validated', '0')
     
-    # Validare strictă: verificăm dacă filmul a fost selectat din dropdown
+    # Validare stricta: verificam daca filmul a fost selectat din dropdown
     if movie_validated != '1':
         flash('Please select a movie from the dropdown list.', 'error')
         return redirect(url_for('friend.show_friend_profile', username=username))
@@ -183,7 +180,7 @@ def recommend_movie(username):
     
     conn = get_db_connection()
     
-    # Verificăm prietenia
+    # Verificam prietenia
     friend_user = conn.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone()
     if not friend_user:
         conn.close()
@@ -202,7 +199,7 @@ def recommend_movie(username):
         flash('You are not friends with this user', 'error')
         return redirect(url_for('friend.show_friends'))
     
-    # Adăugăm recomandarea
+    # Adaugam recomandarea
     try:
         conn.execute(
             'INSERT INTO recommendations (from_user_id, to_user_id, movie_title) VALUES (?, ?, ?)',
@@ -218,15 +215,15 @@ def recommend_movie(username):
     return redirect(url_for('friend.show_friend_profile', username=username))
 
 @friend_bp.route('/recommendations')
+# Afiseaza recomandarile primite
 def show_recommendations():
-    """Afișează recomandările primite"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
     
     user_id = session['user_id']
     
-    # Obținem recomandările
+    # Obtinem recomandarile
     conn = get_db_connection()
     recommendations_data = conn.execute('''
         SELECT r.id, r.movie_title, u.username as from_username
@@ -249,8 +246,8 @@ def show_recommendations():
     return render_template('recommendations.html', recommendations=recommendations)
 
 @friend_bp.route('/recommendations/<int:recommendation_id>/delete', methods=['POST'])
+# Sterge o recomandare
 def delete_recommendation(recommendation_id):
-    """Șterge o recomandare"""
     auth_check = require_auth()
     if auth_check:
         return auth_check
@@ -259,7 +256,7 @@ def delete_recommendation(recommendation_id):
     
     conn = get_db_connection()
     
-    # Verificăm că recomandarea aparține utilizatorului
+    # Verificam ca recomandarea apartine utilizatorului
     rec = conn.execute(
         'SELECT id FROM recommendations WHERE id = ? AND to_user_id = ?',
         (recommendation_id, user_id)
@@ -270,7 +267,7 @@ def delete_recommendation(recommendation_id):
         flash('Recommendation not found', 'error')
         return redirect(url_for('friend.show_recommendations'))
     
-    # Ștergem recomandarea
+    # Stergem recomandarea
     conn.execute(
         'DELETE FROM recommendations WHERE id = ? AND to_user_id = ?',
         (recommendation_id, user_id)

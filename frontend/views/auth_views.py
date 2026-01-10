@@ -1,16 +1,13 @@
-"""
-View handlers pentru autentificare (login, register)
-"""
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 import sys
 import os
 
-# Importăm din backend
+# Importam din backend
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BACKEND_DIR = os.path.join(BASE_DIR, 'backend')
 sys.path.insert(0, BACKEND_DIR)
 
-# Importăm validators din frontend
+# Importam validators din frontend
 FRONTEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, FRONTEND_DIR)
 from utils.validators import validate_username, validate_password
@@ -18,16 +15,16 @@ from utils.validators import validate_username, validate_password
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET'])
+# Afiseaza pagina de login
 def show_login():
-    """Afișează pagina de login"""
-    # Dacă utilizatorul este deja autentificat, redirect la dashboard
+    # Daca utilizatorul este deja autentificat, redirect la dashboard
     if 'user_id' in session:
         return redirect(url_for('dashboard.show_dashboard'))
     return render_template('login.html')
 
 @auth_bp.route('/login', methods=['POST'])
+# Proceseaza login-ul
 def login():
-    """Procesează login-ul"""
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     
@@ -42,18 +39,7 @@ def login():
         flash(message, 'error')
         return render_template('login.html')
     
-    # Apelăm serviciul de autentificare din backend
-    # Trebuie să simulăm request-ul pentru serviciu
-    from flask import jsonify
-    from services.auth_service import proceseaza_login
-    
-    # Creăm un mock request pentru serviciu
-    class MockRequest:
-        def get_json(self):
-            return {'username': username, 'password': password}
-    
-    # Apelăm direct funcția (fără request real)
-    # Alternativ, putem apela direct baza de date
+    # Apelam direct baza de date pentru autentificare
     from models.database import get_db_connection
     from werkzeug.security import check_password_hash
     
@@ -62,7 +48,7 @@ def login():
     conn.close()
     
     if user and check_password_hash(user['password'], password):
-        # Setăm session
+        # Setam session
         session['user_id'] = user['id']
         session['username'] = username
         session['token'] = f'token_secret_pentru_{username}'
@@ -74,15 +60,15 @@ def login():
         return render_template('login.html')
 
 @auth_bp.route('/register', methods=['GET'])
+# Afiseaza pagina de inregistrare
 def show_register():
-    """Afișează pagina de înregistrare"""
     if 'user_id' in session:
         return redirect(url_for('dashboard.show_dashboard'))
     return render_template('register.html')
 
 @auth_bp.route('/register', methods=['POST'])
+# Proceseaza inregistrarea
 def register():
-    """Procesează înregistrarea"""
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     
@@ -97,7 +83,7 @@ def register():
         flash(message, 'error')
         return render_template('register.html')
     
-    # Apelăm direct baza de date pentru înregistrare
+    # Apelam direct baza de date pentru inregistrare
     from models.database import get_db_connection
     from werkzeug.security import generate_password_hash
     import sqlite3
@@ -122,8 +108,8 @@ def register():
         return render_template('register.html')
 
 @auth_bp.route('/logout', methods=['POST'])
+# Delogare utilizator
 def logout():
-    """Delogare utilizator"""
     session.clear()
     flash('Logged out successfully', 'success')
     return redirect(url_for('auth.show_login'))

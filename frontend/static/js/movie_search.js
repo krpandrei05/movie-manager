@@ -1,51 +1,43 @@
-/**
- * JavaScript minim pentru autocomplete căutare filme
- * Folosește TVMaze API prin backend-ul Python
- */
-
-// URL pentru căutare filme (backend API)
+// url pentru cautare filme
 const MOVIE_SEARCH_URL = 'http://localhost:5000/api/search-movies';
 
-// Variabile pentru debounce la căutare
+// variabile pentru debounce la cautare
 let searchTimeout = null;
 let currentSearchResults = [];
 
-// Variabile pentru a salva filmele selectate (pentru validare)
-let selectedMovieDashboard = null; // Filmul selectat din dashboard
-let selectedMovieRecommend = null; // Filmul selectat pentru recomandare
+// variabile pentru a salva filmele selectate
+let selectedMovieDashboard = null; // filmul selectat din dashboard
+let selectedMovieRecommend = null; // filmul selectat pentru recomandare
 
-/**
- * Caută filme pe TVMaze API (cu debounce)
- * @param {string} searchTerm - Termenul de căutare
- */
+// Cauta filme cu debounce
 function searchMovies(searchTerm) {
-    // Anulăm timeout-ul anterior dacă există
+    // anulam timeout-ul anterior daca exista
     if (searchTimeout) {
         clearTimeout(searchTimeout);
     }
     
-    // Dacă câmpul este gol, ascundem rezultatele și resetăm filmul selectat
+    // daca campul este gol, ascundem rezultatele si resetam filmul selectat
     if (!searchTerm || searchTerm.trim().length < 2) {
         hideSearchResults();
         selectedMovieDashboard = null;
         return;
     }
     
-    // Așteptăm 300ms înainte de a face request-ul (debounce)
+    // asteptam 300ms inainte de a face request-ul
     searchTimeout = setTimeout(async () => {
         try {
-            // Facem request către endpoint-ul nostru de proxy pentru căutare
+            // facem request catre backend pentru cautare
             const response = await fetch(`${MOVIE_SEARCH_URL}?s=${encodeURIComponent(searchTerm.trim())}`);
             const data = await response.json();
             
-            // Verificăm dacă căutarea a reușit
+            // verificam daca cautarea a reusit
             if (data.Response === 'True' && data.Search) {
-                // Salvăm rezultatele
+                // salvam rezultatele
                 currentSearchResults = data.Search;
-                // Afișăm rezultatele în dropdown
+                // afisam rezultatele in dropdown
                 displaySearchResults(currentSearchResults, 'movie-search-results');
             } else {
-                // Dacă nu sunt rezultate, afișăm mesaj
+                // daca nu sunt rezultate, afisam mesaj
                 const resultsDiv = document.getElementById('movie-search-results');
                 if (resultsDiv) {
                     resultsDiv.innerHTML = '<div class="movie-search-error">No movies found</div>';
@@ -53,7 +45,7 @@ function searchMovies(searchTerm) {
                 }
             }
         } catch (error) {
-            // În caz de eroare, afișăm mesaj
+            // in caz de eroare, afisam mesaj
             const resultsDiv = document.getElementById('movie-search-results');
             if (resultsDiv) {
                 resultsDiv.innerHTML = '<div class="movie-search-error">Error searching movies</div>';
@@ -63,38 +55,35 @@ function searchMovies(searchTerm) {
     }, 300);
 }
 
-/**
- * Caută filme pentru recomandare (cu debounce)
- * @param {string} searchTerm - Termenul de căutare
- */
+// Cauta filme pentru recomandare cu debounce
 function searchMoviesRecommend(searchTerm) {
-    // Anulăm timeout-ul anterior dacă există
+    // anulam timeout-ul anterior daca exista
     if (searchTimeout) {
         clearTimeout(searchTimeout);
     }
     
-    // Dacă câmpul este gol, ascundem rezultatele și resetăm filmul selectat
+    // daca campul este gol, ascundem rezultatele si resetam filmul selectat
     if (!searchTerm || searchTerm.trim().length < 2) {
         hideSearchResultsRecommend();
         selectedMovieRecommend = null;
         return;
     }
     
-    // Așteptăm 300ms înainte de a face request-ul (debounce)
+    // asteptam 300ms inainte de a face request-ul
     searchTimeout = setTimeout(async () => {
         try {
-            // Facem request către endpoint-ul nostru de proxy pentru căutare
+            // facem request catre backend pentru cautare
             const response = await fetch(`${MOVIE_SEARCH_URL}?s=${encodeURIComponent(searchTerm.trim())}`);
             const data = await response.json();
             
-            // Verificăm dacă căutarea a reușit
+            // verificam daca cautarea a reusit
             if (data.Response === 'True' && data.Search) {
-                // Salvăm rezultatele
+                // salvam rezultatele
                 currentSearchResults = data.Search;
-                // Afișăm rezultatele în dropdown
+                // afisam rezultatele in dropdown
                 displaySearchResults(currentSearchResults, 'movie-search-results-recommend');
             } else {
-                // Dacă nu sunt rezultate, afișăm mesaj
+                // daca nu sunt rezultate, afisam mesaj
                 const resultsDiv = document.getElementById('movie-search-results-recommend');
                 if (resultsDiv) {
                     resultsDiv.innerHTML = '<div class="movie-search-error">No movies found</div>';
@@ -102,7 +91,7 @@ function searchMoviesRecommend(searchTerm) {
                 }
             }
         } catch (error) {
-            // În caz de eroare, afișăm mesaj
+            // in caz de eroare, afisam mesaj
             const resultsDiv = document.getElementById('movie-search-results-recommend');
             if (resultsDiv) {
                 resultsDiv.innerHTML = '<div class="movie-search-error">Error searching movies</div>';
@@ -112,11 +101,7 @@ function searchMoviesRecommend(searchTerm) {
     }, 300);
 }
 
-/**
- * Afișează rezultatele căutării
- * @param {Array} results - Array cu rezultatele căutării
- * @param {string} containerId - ID-ul containerului pentru rezultate
- */
+// Afiseaza rezultatele cautarii in dropdown
 function displaySearchResults(results, containerId) {
     const resultsDiv = document.getElementById(containerId);
     
@@ -130,9 +115,9 @@ function displaySearchResults(results, containerId) {
         return;
     }
     
-    // Cream HTML-ul pentru fiecare rezultat
+    // cream html-ul pentru fiecare rezultat
     resultsDiv.innerHTML = results.map((movie, index) => {
-        // Escapăm caracterele speciale pentru siguranță (pentru onclick)
+        // escapam caracterele speciale pentru siguranta
         const titleEscaped = movie.Title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         const titleHtml = movie.Title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const yearHtml = (movie.Year || 'N/A').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -146,39 +131,35 @@ function displaySearchResults(results, containerId) {
         `;
     }).join('');
     
-    // Afișăm dropdown-ul
+    // afisam dropdown-ul
     resultsDiv.classList.add('show');
 }
 
-/**
- * Selectează un film din lista de rezultate
- * @param {string} movieTitle - Titlul filmului selectat
- * @param {string} containerId - ID-ul containerului
- */
+// Selecteaza un film din lista si completeaza input-ul
 function selectMovie(movieTitle, containerId) {
-    // Căutăm filmul selectat în rezultatele curente pentru validare
+    // cautam filmul selectat in rezultatele curente
     const selectedMovie = currentSearchResults.find(movie => movie.Title === movieTitle);
     
-    // Determinăm care input trebuie completat și salvăm filmul selectat
+    // determinam care input trebuie completat si salvam filmul selectat
     if (containerId === 'movie-search-results') {
-        // Completăm input-ul din dashboard
+        // completam input-ul din dashboard
         const input = document.getElementById('movie-title');
         if (input) {
             input.value = movieTitle;
             selectedMovieDashboard = selectedMovie;
-            // Setăm câmpul hidden pentru validare Python
+            // setam campul hidden pentru validare
             const hiddenInput = document.getElementById('movie-validated');
             if (hiddenInput) {
                 hiddenInput.value = '1';
             }
         }
     } else if (containerId === 'movie-search-results-recommend') {
-        // Completăm input-ul pentru recomandare
+        // completam input-ul pentru recomandare
         const input = document.getElementById('recommend-movie-title');
         if (input) {
             input.value = movieTitle;
             selectedMovieRecommend = selectedMovie;
-            // Setăm câmpul hidden pentru validare Python
+            // setam campul hidden pentru validare
             const hiddenInput = document.getElementById('recommend-movie-validated');
             if (hiddenInput) {
                 hiddenInput.value = '1';
@@ -186,14 +167,12 @@ function selectMovie(movieTitle, containerId) {
         }
     }
     
-    // Ascundem dropdown-ul
+    // ascundem dropdown-ul
     hideSearchResults();
     hideSearchResultsRecommend();
 }
 
-/**
- * Afișează dropdown-ul de rezultate (dashboard)
- */
+// Afiseaza dropdown-ul de rezultate pentru dashboard
 function showSearchResults() {
     const input = document.getElementById('movie-title');
     if (input) {
@@ -207,11 +186,9 @@ function showSearchResults() {
     }
 }
 
-/**
- * Ascunde dropdown-ul de rezultate (dashboard)
- */
+// Ascunde dropdown-ul de rezultate pentru dashboard
 function hideSearchResults() {
-    // Folosim un mic delay pentru a permite click-ul pe item
+    // folosim un mic delay pentru a permite click-ul pe item
     setTimeout(() => {
         const resultsDiv = document.getElementById('movie-search-results');
         if (resultsDiv) {
@@ -220,9 +197,7 @@ function hideSearchResults() {
     }, 200);
 }
 
-/**
- * Afișează dropdown-ul de rezultate (recomandare)
- */
+// Afiseaza dropdown-ul de rezultate pentru recomandare
 function showSearchResultsRecommend() {
     const input = document.getElementById('recommend-movie-title');
     if (input) {
@@ -236,11 +211,9 @@ function showSearchResultsRecommend() {
     }
 }
 
-/**
- * Ascunde dropdown-ul de rezultate (recomandare)
- */
+// Ascunde dropdown-ul de rezultate pentru recomandare
 function hideSearchResultsRecommend() {
-    // Folosim un mic delay pentru a permite click-ul pe item
+    // folosim un mic delay pentru a permite click-ul pe item
     setTimeout(() => {
         const resultsDiv = document.getElementById('movie-search-results-recommend');
         if (resultsDiv) {
@@ -248,4 +221,3 @@ function hideSearchResultsRecommend() {
         }
     }, 200);
 }
-

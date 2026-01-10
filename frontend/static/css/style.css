@@ -148,7 +148,6 @@ button:hover {
     overflow: hidden;
 }
 
-
 .sidebar-nav .nav-item:hover {
     background-color: #252525;
     color: white;
@@ -166,7 +165,6 @@ button:hover {
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 
 /* Continutul principal al paginii */
 .main-content {
@@ -334,10 +332,6 @@ button:hover {
 .movie-search-error {
     padding: 15px;
     text-align: center;
-    color: #888;
-}
-
-.movie-search-error {
     color: #dc3545;
 }
 
@@ -876,21 +870,33 @@ button:hover {
     display: flex;
     justify-content: center;
     flex-direction: row;
-    margin-top: 2.5em;
+    gap: 0.5em;
+    margin-top: 1.5em;
 }
 
 .button1 {
-    padding: 0.5em;
-    padding-left: 1.1em;
-    padding-right: 1.1em;
+    flex: 1;
+    padding: 0.5em 1.1em;
+    margin: 0;
     border-radius: 5px;
-    margin-right: 0.5em;
     border: none;
     outline: none;
     transition: .4s ease-in-out;
     background-color: #252525;
     color: white;
     cursor: pointer;
+    font-size: 1em;
+    font-family: inherit;
+    line-height: 1.5;
+    min-width: 0;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    min-height: 2.5em;
 }
 
 .button1:hover {
@@ -899,9 +905,9 @@ button:hover {
 }
 
 .button2 {
-    padding: 0.5em;
-    padding-left: 2.3em;
-    padding-right: 2.3em;
+    flex: 1;
+    padding: 0.5em 1.1em;
+    margin: 0;
     border-radius: 5px;
     border: none;
     outline: none;
@@ -909,6 +915,19 @@ button:hover {
     background-color: #252525;
     color: white;
     cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1em;
+    font-family: inherit;
+    line-height: 1.5;
+    min-width: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    min-height: 2.5em;
 }
 
 .button2:hover {
@@ -1230,25 +1249,4 @@ button:hover {
     color: #ffc107;
     font-weight: bold;
     font-size: 1.1em;
-}
-
-/* Responsive design pentru ecrane mai mici */
-@media (max-width: 768px) {
-    .movie-lists {
-        grid-template-columns: 1fr;
-    }
-    
-    .notification {
-        right: 10px;
-        left: 10px;
-        min-width: auto;
-    }
-    
-    .friends-list-page {
-        grid-template-columns: 1fr;
-    }
-    
-    .all-movies-container {
-        grid-template-columns: 1fr;
-    }
 }

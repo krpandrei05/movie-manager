@@ -9,14 +9,14 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Container pentru notificari (flash messages) -->
+    <!-- Container pentru notificari -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div id="notification" class="notification {% if messages[0][0] == 'error' %}error{% elif messages[0][0] == 'success' %}success{% endif %}">
                 {{ messages[0][1] }}
             </div>
             <script>
-                // Ascunde notificarea după 3 secunde
+                // Ascunde notificarea dupa 3 secunde
                 setTimeout(function() {
                     document.getElementById('notification').className = 'notification';
                 }, 3000);
@@ -26,7 +26,7 @@
         {% endif %}
     {% endwith %}
     
-    <!-- Container pentru confirmare personalizata (pentru stergere film) -->
+    <!-- Container pentru confirmare personalizata pentru stergere film -->
     <div id="confirm-dialog" class="confirm-dialog">
         <div class="confirm-dialog-content">
             <h3 class="confirm-title">Confirm Delete</h3>
@@ -40,52 +40,75 @@
     
     {% block content %}{% endblock %}
     
-    {% block scripts %}
+    <!-- Script pentru dialog-ul de confirmare - trebuie sa fie in afara block-ului scripts -->
     <script>
-        // Funcție pentru afișarea dialog-ului de confirmare custom
-        let confirmCallback = null;
+        // Functie pentru afisarea dialog-ului de confirmare
         let confirmForm = null;
         
         function showConfirmDialog(message, formElement) {
             confirmForm = formElement;
-            confirmCallback = function() {
-                if (confirmForm) {
-                    confirmForm.submit();
-                }
-            };
-            
             document.getElementById('confirm-message').textContent = message;
             document.getElementById('confirm-dialog').classList.add('show');
         }
         
         function hideConfirmDialog() {
             document.getElementById('confirm-dialog').classList.remove('show');
-            confirmCallback = null;
             confirmForm = null;
         }
         
         // Event listeners pentru butoanele de confirmare
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('confirm-yes').addEventListener('click', function() {
-                if (confirmCallback) {
-                    confirmCallback();
-                }
-                hideConfirmDialog();
-            });
+            const confirmYesBtn = document.getElementById('confirm-yes');
+            const confirmNoBtn = document.getElementById('confirm-no');
+            const confirmDialog = document.getElementById('confirm-dialog');
             
-            document.getElementById('confirm-no').addEventListener('click', function() {
-                hideConfirmDialog();
-            });
+            if (confirmYesBtn) {
+                confirmYesBtn.addEventListener('click', function() {
+                    if (confirmForm) {
+                        // Salvam referinta la formular si action-ul
+                        const form = confirmForm;
+                        const action = form.getAttribute('action');
+                        
+                        // Ascundem dialogul
+                        document.getElementById('confirm-dialog').classList.remove('show');
+                        confirmForm = null;
+                        
+                        // Trimitem request-ul POST folosind fetch
+                        fetch(action, {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            }
+                        }).then(function(response) {
+                            // Reincarcam pagina dupa stergere
+                            window.location.href = window.location.href;
+                        }).catch(function(error) {
+                            // In caz de eroare, reincarcam pagina oricum
+                            window.location.href = window.location.href;
+                        });
+                    }
+                });
+            }
             
-            // Închidere la click pe background
-            document.getElementById('confirm-dialog').addEventListener('click', function(e) {
-                if (e.target === this) {
+            if (confirmNoBtn) {
+                confirmNoBtn.addEventListener('click', function() {
                     hideConfirmDialog();
-                }
-            });
+                });
+            }
+            
+            // Inchidere la click pe background
+            if (confirmDialog) {
+                confirmDialog.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        hideConfirmDialog();
+                    }
+                });
+            }
         });
     </script>
-    {% endblock %}
+    
+    {% block scripts %}{% endblock %}
 </body>
 </html>
 

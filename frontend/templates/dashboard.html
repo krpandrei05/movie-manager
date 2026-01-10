@@ -3,8 +3,8 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/movie_search.js') }}"></script>
 <script>
-    // Setăm câmpul hidden când se selectează un film din dropdown
-    // Această funcție este apelată din movie_search.js când se selectează un film
+    // Setam campul hidden cand se selecteaza un film din dropdown
+    // Aceasta functie este apelata din movie_search.js cand se selecteaza un film
     function setMovieValidated(validated) {
         const hiddenInput = document.getElementById('movie-validated');
         if (hiddenInput) {
@@ -12,7 +12,7 @@
         }
     }
     
-    // Resetăm validarea când se modifică input-ul
+    // Resetam validarea cand se modifica input-ul
     document.addEventListener('DOMContentLoaded', function() {
         const movieInput = document.getElementById('movie-title');
         if (movieInput) {
