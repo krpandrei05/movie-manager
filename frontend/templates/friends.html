@@ -40,22 +40,22 @@
         <div class="content-wrapper">
             <!-- Pagina Friends -->
             <div id="page-friends" class="page-content">
-                <section class="friends-page-section">
+                <section class="friends-page-section" style="text-align: center; max-width: 800px; margin: 0 auto;">
                     <h1 class="page-title">Friends</h1>
                     
                     <!-- Formular pentru adaugarea unui prieten -->
-                    <div class="add-friend-page">
-                        <form method="POST" action="{{ url_for('friend.add_friend') }}" style="display: flex; gap: 10px;">
-                            <input type="text" name="friend_username" placeholder="Search user..." class="friend-input" required>
+                    <div class="add-friend-page" style="margin-bottom: 30px; display: flex; justify-content: center;">
+                        <form method="POST" action="{{ url_for('friend.add_friend') }}" style="display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%; max-width: 600px;">
+                            <input type="text" name="friend_username" placeholder="Search user..." class="friend-input" style="width: 100%;" required>
                             <button type="submit" class="add-friend-btn">Add Friend</button>
                         </form>
                     </div>
                     
                     <!-- Lista de prieteni -->
-                    <div id="friends-list-page" class="friends-list-page">
+                    <div id="friends-list-page" class="friends-list-page" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
                         {% if friends %}
                             {% for friend in friends %}
-                                <div class="friend-card">
+                                <div class="friend-card" style="width: 100%; max-width: 500px;">
                                     <a href="{{ url_for('friend.show_friend_profile', username=friend) }}">{{ friend }}</a>
                                 </div>
                             {% endfor %}

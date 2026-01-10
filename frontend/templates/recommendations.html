@@ -48,7 +48,7 @@
                         {% if recommendations %}
                             {% for rec in recommendations %}
                                 <div class="recommendation-card">
-                                    <form method="POST" action="{{ url_for('friend.delete_recommendation', recommendation_id=rec.id) }}" style="display: inline; float: right;" onsubmit="return confirm('Are you sure you want to delete this recommendation?');">
+                                    <form method="POST" action="{{ url_for('friend.delete_recommendation', recommendation_id=rec.id) }}" style="display: inline; float: right;" onsubmit="event.preventDefault(); showConfirmDialog('Are you sure you want to delete the recommendation for &quot;{{ rec.movie_title }}&quot; from {{ rec.from_username }}?', this);">
                                         <button type="submit" class="recommendation-delete-btn" title="Delete recommendation">
                                             <span class="delete-icon">×</span>
                                         </button>

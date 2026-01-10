@@ -23,6 +23,7 @@ Aplicație web pentru gestionarea filmelor, serialelor și show-urilor TV. Utili
 ### Autentificare
 - **Înregistrare**: Utilizatorii pot crea un cont nou cu username și parolă
 - **Login**: Utilizatorii se pot autentifica cu username și parolă
+  - **Enter key**: Apăsarea tastei Enter în câmpul de parolă trimite automat formularul
 - **Securitate**: Parolele sunt criptate în baza de date folosind hash-uri (Werkzeug)
 - **Sessions**: Gestionare sesiuni pentru autentificare persistentă
 
@@ -36,16 +37,22 @@ Aplicație web pentru gestionarea filmelor, serialelor și show-urilor TV. Utili
 - **Ștergere filme**: Utilizatorii pot șterge filme din liste
 - **Căutare filme**: Integrare cu TVMaze API pentru căutarea filmelor, serialelor și show-urilor TV (gratuit, fără cheie API)
 - **Autocomplete**: Căutare în timp real cu dropdown de rezultate
+- **Validare strictă**: Filmele pot fi adăugate doar dacă sunt selectate din dropdown-ul de rezultate (validare Python)
 
 ### Prieteni
 - **Adăugare prieteni**: Utilizatorii pot adăuga alți utilizatori ca prieteni
+  - **Layout vertical**: Search bar-ul și butonul "Add Friend" sunt așezate unul sub altul, centrate
 - **Vizualizare listă prieteni**: Utilizatorii pot vedea lista cu toți prietenii lor
 - **Vizualizare filme prieteni**: Utilizatorii pot vedea toate listele de filme ale prietenilor (To Watch, Watching, Completed)
 - **Recomandare filme**: Utilizatorii pot recomanda filme prietenilor lor
+  - **Autocomplete**: Aceeași funcționalitate de căutare ca în "My Movies"
+  - **Validare strictă**: Filmele pot fi recomandate doar dacă sunt selectate din dropdown
+  - **Layout vertical**: "Recommend a Movie" → Search Box → Button (așezate vertical)
 
 ### Recomandări
 - **Vizualizare recomandări**: Utilizatorii pot vedea toate recomandările primite de la prieteni
 - **Ștergere recomandări**: Utilizatorii pot șterge recomandările primite
+  - **Dialog de confirmare**: Dialog custom cu mesaje specifice pentru fiecare acțiune
 
 ---
 
@@ -149,7 +156,34 @@ Aplicația necesită **două servere Flask** care rulează simultan:
 - **Backend** (port 5000): API REST pentru date
 - **Frontend** (port 5001): Interfață web HTML
 
-### Terminal 1 - Backend API
+### Opțiunea 1: Script automat (Recomandat)
+
+Folosește scriptul `start.py` pentru a porni ambele servere simultan:
+
+```bash
+cd movie-manager
+python3 start.py
+```
+
+**Avantaje:**
+- Pornește automat ambele servere
+- Inițializează baza de date
+- Afișează informații clare despre serverele pornite
+- O singură comandă pentru tot
+
+**Output:**
+```
+🎬 Movie Manager - Pornire servere
+📡 Backend API:  http://localhost:5000
+🌐 Frontend Web: http://localhost:5001
+💡 Deschide browser-ul la: http://localhost:5001
+```
+
+**Oprire:** Apasă `Ctrl+C` pentru a opri ambele servere.
+
+### Opțiunea 2: Pornire manuală (două terminale)
+
+#### Terminal 1 - Backend API
 ```bash
 cd movie-manager
 python3 backend/app.py
@@ -162,7 +196,7 @@ Backend-ul va rula pe: `http://localhost:5000`
 - Servește API REST endpoints (JSON responses)
 - Gestionează CORS pentru comunicare cu frontend-ul
 
-### Terminal 2 - Frontend Web
+#### Terminal 2 - Frontend Web
 ```bash
 cd movie-manager
 python3 frontend/app.py
@@ -557,6 +591,34 @@ Validări:
 - Movie title: minim 1 caracter
 - Rating: între 1 și 10
 
+### Validare Strictă Filme
+
+Aplicația implementează **validare strictă** pentru adăugarea și recomandarea filmelor:
+
+- **Câmp hidden**: `movie_validated` indică dacă filmul a fost selectat din dropdown
+- **Validare Python**: Backend-ul verifică `movie_validated == '1'` înainte de a permite adăugarea
+- **Notificări**: Dacă filmul nu este selectat din dropdown, se afișează un flash message de eroare
+- **Fără popup-uri**: Toate notificările sunt afișate pe site (fără `alert()` browser)
+
+**Implementare:**
+- JavaScript setează `movie_validated = '1'` când utilizatorul selectează un film din dropdown
+- Python verifică acest câmp în `dashboard_views.py` și `friend_views.py`
+- Dacă validarea eșuează, se returnează un flash message și se face redirect
+
+### Validare Strictă Filme
+
+Aplicația implementează **validare strictă** pentru adăugarea și recomandarea filmelor:
+
+- **Câmp hidden**: `movie_validated` indică dacă filmul a fost selectat din dropdown
+- **Validare Python**: Backend-ul verifică `movie_validated == '1'` înainte de a permite adăugarea
+- **Notificări**: Dacă filmul nu este selectat din dropdown, se afișează un flash message de eroare
+- **Fără popup-uri**: Toate notificările sunt afișate pe site (fără `alert()` browser)
+
+**Implementare:**
+- JavaScript setează `movie_validated = '1'` când utilizatorul selectează un film din dropdown
+- Python verifică acest câmp în `dashboard_views.py` și `friend_views.py`
+- Dacă validarea eșuează, se returnează un flash message și se face redirect
+
 ---
 
 ## 🌐 API Extern
@@ -620,8 +682,12 @@ JavaScript este folosit doar pentru:
 - **Autocomplete search**: Căutare în timp real cu debounce (300ms)
 - **Dropdown interactions**: Click handlers pentru selectare filme
 - **Scroll management**: Gestionare scroll în dropdown-uri
+- **Enter key**: Detectare Enter key în formularul de login
+- **Dialog custom**: Funcționalitate pentru dialog-ul de confirmare custom
 
-**Fișier**: `frontend/static/js/movie_search.js` (~240 linii)
+**Fișier**: `frontend/static/js/movie_search.js` (~250 linii)
+
+**Notă**: Aplicația **nu folosește** `alert()` sau `confirm()` nativ JavaScript. Toate notificările și confirmările sunt implementate folosind componente custom care se potrivesc cu design-ul aplicației.
 
 ---
 

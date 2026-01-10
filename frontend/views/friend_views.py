@@ -168,8 +168,14 @@ def recommend_movie(username):
     
     user_id = session['user_id']
     movie_title = request.form.get('movie_title', '').strip()
+    movie_validated = request.form.get('movie_validated', '0')
     
-    # Validare
+    # Validare strictă: verificăm dacă filmul a fost selectat din dropdown
+    if movie_validated != '1':
+        flash('Please select a movie from the dropdown list.', 'error')
+        return redirect(url_for('friend.show_friend_profile', username=username))
+    
+    # Validare titlu
     valid, message = validate_movie_title(movie_title)
     if not valid:
         flash(message, 'error')

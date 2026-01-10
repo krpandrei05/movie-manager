@@ -84,8 +84,14 @@ def add_movie():
     user_id = session['user_id']
     title = request.form.get('title', '').strip()
     status = request.form.get('status', 'To Watch')
+    movie_validated = request.form.get('movie_validated', '0')
     
-    # Validare
+    # Validare strictă: verificăm dacă filmul a fost selectat din dropdown
+    if movie_validated != '1':
+        flash('Please select a movie from the dropdown list.', 'error')
+        return redirect(url_for('dashboard.show_dashboard'))
+    
+    # Validare titlu
     valid, message = validate_movie_title(title)
     if not valid:
         flash(message, 'error')

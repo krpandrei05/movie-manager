@@ -166,6 +166,11 @@ function selectMovie(movieTitle, containerId) {
         if (input) {
             input.value = movieTitle;
             selectedMovieDashboard = selectedMovie;
+            // Setăm câmpul hidden pentru validare Python
+            const hiddenInput = document.getElementById('movie-validated');
+            if (hiddenInput) {
+                hiddenInput.value = '1';
+            }
         }
     } else if (containerId === 'movie-search-results-recommend') {
         // Completăm input-ul pentru recomandare
@@ -173,6 +178,11 @@ function selectMovie(movieTitle, containerId) {
         if (input) {
             input.value = movieTitle;
             selectedMovieRecommend = selectedMovie;
+            // Setăm câmpul hidden pentru validare Python
+            const hiddenInput = document.getElementById('recommend-movie-validated');
+            if (hiddenInput) {
+                hiddenInput.value = '1';
+            }
         }
     }
     

@@ -2,6 +2,26 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/movie_search.js') }}"></script>
+<script>
+    // Setăm câmpul hidden când se selectează un film din dropdown
+    // Această funcție este apelată din movie_search.js când se selectează un film
+    function setMovieValidated(validated) {
+        const hiddenInput = document.getElementById('movie-validated');
+        if (hiddenInput) {
+            hiddenInput.value = validated ? '1' : '0';
+        }
+    }
+    
+    // Resetăm validarea când se modifică input-ul
+    document.addEventListener('DOMContentLoaded', function() {
+        const movieInput = document.getElementById('movie-title');
+        if (movieInput) {
+            movieInput.addEventListener('input', function() {
+                setMovieValidated(false);
+            });
+        }
+    });
+</script>
 {% endblock %}
 
 {% block content %}
@@ -49,10 +69,11 @@
                     
                     <!-- Sectiunea pentru adaugarea unui film nou -->
                     <div class="add-movie">
-                        <form method="POST" action="{{ url_for('dashboard.add_movie') }}" style="display: flex; gap: 10px; width: 100%;">
+                        <form method="POST" action="{{ url_for('dashboard.add_movie') }}" id="add-movie-form" style="display: flex; gap: 10px; width: 100%;">
                             <div class="movie-search-container" style="flex: 1;">
-                                <input type="text" name="title" id="movie-title" placeholder="Search movie title..." autocomplete="off" oninput="searchMovies(this.value); selectedMovieDashboard = null;" onfocus="showSearchResults()" onblur="hideSearchResults()" required>
+                                <input type="text" name="title" id="movie-title" placeholder="Search movie title..." autocomplete="off" oninput="searchMovies(this.value); selectedMovieDashboard = null; setMovieValidated(false);" onfocus="showSearchResults()" onblur="hideSearchResults()" required>
                                 <input type="hidden" name="status" value="To Watch">
+                                <input type="hidden" name="movie_validated" id="movie-validated" value="0">
                                 <div id="movie-search-results" class="movie-search-results"></div>
                             </div>
                             <button type="submit" class="add-movie-btn">Add Movie</button>
@@ -81,7 +102,7 @@
                                                 <span class="btn-text">Completed</span>
                                             </button>
                                         </form>
-                                        <form method="POST" action="{{ url_for('dashboard.delete_movie', movie_id=movie.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this movie?');">
+                                        <form method="POST" action="{{ url_for('dashboard.delete_movie', movie_id=movie.id) }}" style="display: inline;" onsubmit="event.preventDefault(); showConfirmDialog('Are you sure you want to delete the movie &quot;{{ movie.title }}&quot;?', this);">
                                             <button type="submit" class="delete-btn" title="Delete movie">
                                                 <span class="btn-icon">🗑</span>
                                                 <span class="btn-text">Delete</span>
@@ -107,7 +128,7 @@
                                                 <span class="btn-text">Completed</span>
                                             </button>
                                         </form>
-                                        <form method="POST" action="{{ url_for('dashboard.delete_movie', movie_id=movie.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this movie?');">
+                                        <form method="POST" action="{{ url_for('dashboard.delete_movie', movie_id=movie.id) }}" style="display: inline;" onsubmit="event.preventDefault(); showConfirmDialog('Are you sure you want to delete the movie &quot;{{ movie.title }}&quot;?', this);">
                                             <button type="submit" class="delete-btn" title="Delete movie">
                                                 <span class="btn-icon">🗑</span>
                                                 <span class="btn-text">Delete</span>
@@ -142,7 +163,7 @@
                                                 </select>
                                             </div>
                                         </form>
-                                        <form method="POST" action="{{ url_for('dashboard.delete_movie', movie_id=movie.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this movie?');">
+                                        <form method="POST" action="{{ url_for('dashboard.delete_movie', movie_id=movie.id) }}" style="display: inline;" onsubmit="event.preventDefault(); showConfirmDialog('Are you sure you want to delete the movie &quot;{{ movie.title }}&quot;?', this);">
                                             <button type="submit" class="delete-btn" title="Delete movie">
                                                 <span class="btn-icon">🗑</span>
                                                 <span class="btn-text">Delete</span>

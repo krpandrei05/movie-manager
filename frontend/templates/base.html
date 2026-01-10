@@ -30,7 +30,7 @@
     <div id="confirm-dialog" class="confirm-dialog">
         <div class="confirm-dialog-content">
             <h3 class="confirm-title">Confirm Delete</h3>
-            <p class="confirm-message" id="confirm-message">Are you sure you want to delete this movie?</p>
+            <p class="confirm-message" id="confirm-message">Are you sure you want to delete this item?</p>
             <div class="confirm-buttons">
                 <button class="confirm-btn confirm-yes" id="confirm-yes">Yes</button>
                 <button class="confirm-btn confirm-no" id="confirm-no">No</button>
@@ -40,7 +40,52 @@
     
     {% block content %}{% endblock %}
     
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+    <script>
+        // Funcție pentru afișarea dialog-ului de confirmare custom
+        let confirmCallback = null;
+        let confirmForm = null;
+        
+        function showConfirmDialog(message, formElement) {
+            confirmForm = formElement;
+            confirmCallback = function() {
+                if (confirmForm) {
+                    confirmForm.submit();
+                }
+            };
+            
+            document.getElementById('confirm-message').textContent = message;
+            document.getElementById('confirm-dialog').classList.add('show');
+        }
+        
+        function hideConfirmDialog() {
+            document.getElementById('confirm-dialog').classList.remove('show');
+            confirmCallback = null;
+            confirmForm = null;
+        }
+        
+        // Event listeners pentru butoanele de confirmare
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('confirm-yes').addEventListener('click', function() {
+                if (confirmCallback) {
+                    confirmCallback();
+                }
+                hideConfirmDialog();
+            });
+            
+            document.getElementById('confirm-no').addEventListener('click', function() {
+                hideConfirmDialog();
+            });
+            
+            // Închidere la click pe background
+            document.getElementById('confirm-dialog').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideConfirmDialog();
+                }
+            });
+        });
+    </script>
+    {% endblock %}
 </body>
 </html>
 
