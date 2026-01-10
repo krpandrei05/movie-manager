@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Movie Manager{% endblock %}</title>
+    <link rel="icon" type="image/png" sizes="256x256" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Container pentru notificari (flash messages) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div id="notification" class="notification {% if messages[0][0] == 'error' %}error{% elif messages[0][0] == 'success' %}success{% endif %}">
+                {{ messages[0][1] }}
+            </div>
+            <script>
+                // Ascunde notificarea după 3 secunde
+                setTimeout(function() {
+                    document.getElementById('notification').className = 'notification';
+                }, 3000);
+            </script>
+        {% else %}
+            <div id="notification" class="notification"></div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Container pentru confirmare personalizata (pentru stergere film) -->
+    <div id="confirm-dialog" class="confirm-dialog">
+        <div class="confirm-dialog-content">
+            <h3 class="confirm-title">Confirm Delete</h3>
+            <p class="confirm-message" id="confirm-message">Are you sure you want to delete this movie?</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn confirm-yes" id="confirm-yes">Yes</button>
+                <button class="confirm-btn confirm-no" id="confirm-no">No</button>
+            </div>
+        </div>
+    </div>
+    
+    {% block content %}{% endblock %}
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
+

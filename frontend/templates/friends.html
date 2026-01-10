@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Dashboard-ul principal -->
+<div id="dashboard">
+    <!-- Meniu lateral pe stanga -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="{{ url_for('dashboard.show_dashboard') }}" class="nav-item" data-page="dashboard">My Movies</a></li>
+                <li><a href="{{ url_for('friend.show_friends') }}" class="nav-item active" data-page="friends">Friends</a></li>
+                <li><a href="{{ url_for('friend.show_recommendations') }}" class="nav-item" data-page="recommendations">Recommendations</a></li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <form method="POST" action="{{ url_for('auth.logout') }}" style="display: inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Continutul principal al paginii -->
+    <main class="main-content">
+        <!-- Header cu logo, nume aplicatie si username -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="header-logo" onclick="document.querySelector('.sidebar').classList.toggle('collapsed')" style="cursor: pointer;" title="Toggle menu">
+                <h2 class="header-title">Movie Manager</h2>
+            </div>
+            <div class="user-info">
+                <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                </svg>
+                <span id="username-display" class="username-text">{{ session.get('username', 'User') }}</span>
+            </div>
+        </header>
+
+        <!-- Container principal pentru continut -->
+        <div class="content-wrapper">
+            <!-- Pagina Friends -->
+            <div id="page-friends" class="page-content">
+                <section class="friends-page-section">
+                    <h1 class="page-title">Friends</h1>
+                    
+                    <!-- Formular pentru adaugarea unui prieten -->
+                    <div class="add-friend-page">
+                        <form method="POST" action="{{ url_for('friend.add_friend') }}" style="display: flex; gap: 10px;">
+                            <input type="text" name="friend_username" placeholder="Search user..." class="friend-input" required>
+                            <button type="submit" class="add-friend-btn">Add Friend</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Lista de prieteni -->
+                    <div id="friends-list-page" class="friends-list-page">
+                        {% if friends %}
+                            {% for friend in friends %}
+                                <div class="friend-card">
+                                    <a href="{{ url_for('friend.show_friend_profile', username=friend) }}">{{ friend }}</a>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p style="color: #888; text-align: center; padding: 20px;">No friends yet. Add some!</p>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
