@@ -1,10 +1,10 @@
 # Biblioteci Python necesare pentru proiectul Movie Manager
 
-# Framework web Flask
+# Framework web Flask (pentru backend API si frontend web)
 Flask==3.0.0
 
-# Utilitare pentru securitate (criptare parole)
+# Utilitare pentru securitate (criptare parole - generate_password_hash, check_password_hash)
 Werkzeug==3.0.1
 
-# Client HTTP pentru comunicare frontend-backend
+# Client HTTP pentru comunicare frontend-backend (folosit in frontend/utils/api_client.py)
 requests==2.31.0
